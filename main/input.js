@@ -1,20 +1,26 @@
-export const pointer = {
-  x: 0,
-  y: 0,
-  down: false
-};
+export const pointer = new Map();
+export const key = {}
+
+function set(Id, x, y) {
+  pointer.set(Id, {x: x, y: y})
+}
 
 window.addEventListener("pointerdown", e => {
-  pointer.down = true;
-  pointer.x = e.clientX;
-  pointer.y = e.clientY;
+  set(e.pointerId, e.clientX, e.clientY)
 });
 
 window.addEventListener("pointermove", e => {
-  pointer.x = e.clientX;
-  pointer.y = e.clientY;
+  set(e.pointerId, e.clientX, e.clientY)
 });
 
-window.addEventListener("pointerup", () => {
-  pointer.down = false;
+window.addEventListener("pointerup", e => {
+  pointer.delete(e.pointerId)
+});
+
+window.addEventListener("keydown", e => {
+  key[e] = true;
+});
+
+window.addEventListener("keyup", e => {
+  key[e] = false;
 });
