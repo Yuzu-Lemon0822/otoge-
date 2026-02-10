@@ -34,7 +34,7 @@ newPen() //初期で一本装備
 export function pen(Id = "pen0") {
   return {
     set(pos) {
-      canvasData
+      canvasData[Id] = pos;
     }
   };
 }
