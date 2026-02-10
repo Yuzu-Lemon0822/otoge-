@@ -22,9 +22,9 @@ const math = {
 function newPen (Id = `pen${Object.keys(canvasData).length}`, opts = {}) {
   const data = {
     down: false,
-    pos: [0,0] ?? opts.pos,
-    color: "#000000" ?? opts.color,
-    size: 1 ?? opts.size,
+    pos: opts.pos ?? [0,0],
+    color: opts.color ?? "#000000",
+    size: opts.size ?? 1,
   }
   canvasData[Id] = data;
 }
@@ -33,8 +33,8 @@ newPen() //初期で一本装備
 
 export function pen(Id = "pen0") {
   return {
-    set(pos) {
-      canvasData[Id] = pos;
+    setPos(pos) {
+      canvasData[Id].pos = pos;
     }
   };
 }
