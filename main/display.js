@@ -26,15 +26,16 @@ const math = {
     rotate(center, pos, dir) {
       const a = this.convert(dir);
       const d = math.sub(pos, center);
-      return [d[0]*a[0]-d[1]*a[1],d[0]*a[1]-d[1]*a[0]]
+      return [d[0]*a[0]-d[1]*a[1],d[0]*a[1]+d[1]*a[0]]
     },
   }
 };
 
 function convert(Id, pos) { //Idのcanvasデータに基づいてposを計算します
-  let tmp = math.mul(tmp, canvasData[Id].stretch)
+  let tmp = pos;
+  tmp = math.mul(tmp, canvasData[Id].canvas.stretch)
   tmp = math.trigonometric.rotate([0,0], pos, canvasData[Id].catch.canvas)
-  tmp = math.add(pos, canvasData[Id].origin)
+  tmp = math.add(pos, canvasData[Id].canvas.origin)
   return tmp;
 }
 
