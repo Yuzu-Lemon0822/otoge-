@@ -21,12 +21,12 @@ const math = {
   div(v1, v2) { return this.calc(v1, v2, (a, b) => a / b); },
   trigonometric: {
     convert (v) {
-      return Array.isArray(v) ? v : [Math.sin(v), Math.cos(v)];
+      return Array.isArray(v) ? v : [Math.cos(v), Math.sin(v)];
     },
     rotate(center, pos, dir) {
       const a = this.convert(dir);
       const d = math.sub(pos, center);
-      return [d[0]*a[1]-d[1]*a[0],d[0]*a[0]-d[1]*a[1]]
+      return [d[0]*a[0]-d[1]*a[1],d[0]*a[1]-d[1]*a[0]]
     },
   }
 };
@@ -38,21 +38,34 @@ function convert(Id, pos) { //Idのcanvasデータに基づいてposを計算し
   return tmp;
 }
 
+function move(Id, pos) {
+  const nowPos = convert(Id, canvasData[Id].pos);
+  const newPos = convert(Id, pos);
+  ctx.moveTo(...nowPos)
+  if (canvasData[Id].down) {
+    ctx.lineTo(...newPos)
+  } else {
+    ctx.moveTo(...newPos)
+  }
+  canvasData[Id].pos = newPos;
+}
+
 function newPen (Id = `pen${Object.keys(canvasData).length}`, opts = {}) {
+  const penAngle = opts.penAngle ?? 0, canvasAngle = opts.canvasAngle ?? 0;
   const data = {
     down: false,
     pos: opts.pos ?? [0,0],
     color: opts.color ?? "#000000",
     size: opts.size ?? 1,
-    angle: opts.angle ?? 0,
+    angle: penAngle,
     canvas: {
       origin: opts.origin ?? [0,0],
       stretch: opts.stretch ?? [1,1],
-      angle: opts.angle ?? 0, 
+      angle: canvasAngle,
     },
     catch: {
-      pen: [0,1],
-      canvas: [0,1]
+      pen: [Math.cos(penAngle), Math.sin(penAngle)],
+      canvas: [Math.cos(canvasAngle), Math.sin(canvasAngle)]
     }
   }
   canvasData[Id] = data;
@@ -62,20 +75,31 @@ newPen() //初期で一本装備
 
 export function pen(Id = "pen0") {
   return {
+    down(){
+      canvasData[Id].down = true;
+    },
+    up(){
+      canvasData[Id].down = false;
+    },
+
     setPos(pos) {
-      canvasData[Id].pos = pos;
+      move(Id, pos);
     },
     move(pos) {
-      canvasData[Id].pos = add(canvasData[Id].pos, pos);
+      move(Id, math.add(canvasData[Id].pos, pos));
     },
+    forward(step) {
+      move(Id, math.add(canvasData[Id].pos, math.mul(canvasData[Id].catch.pen, step)))
+    },
+
     setDir(dir) {
       canvasData[Id].angle = dir;
-      canvasData[Id].catch.pen = [Math.sin(dir), Math.cos(dir)];
+      canvasData[Id].catch.pen = [Math.cos(dir), Math.sin(dir)];
     },
     rotate(dir) {
       const tmp = canvasData[Id].angle + dir;
       canvasData[Id].angle = tmp;
-      canvasData[Id].catch.pen = [Math.sin(tmp), Math.cos(tmp)];
-    }
+      canvasData[Id].catch.pen = [Math.cos(tmp), Math.sin(tmp)];
+    },
   };
 }
